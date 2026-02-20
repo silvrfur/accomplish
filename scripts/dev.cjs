@@ -1,8 +1,8 @@
 const { spawn, execSync } = require('child_process');
 const path = require('path');
-const treeKill= require('tree-kill');
+const treeKill = require('tree-kill');
 
-const isWin=process.platform==='win32';
+const isWin = process.platform === 'win32';
 const pnpmCmd = isWin ? 'pnpm.cmd' : 'pnpm';
 
 try {
@@ -58,7 +58,7 @@ function killTree(pid, signal = 'SIGTERM') {
 function killPort5173() {
   return new Promise((resolve) => {
     try {
-      if (process.platform === 'win32') {
+      if (isWin) {
         execSync(
           `for /f "tokens=5" %a in ('netstat -ano ^| findstr :5173 ^| findstr LISTENING') do taskkill /F /PID %a`,
           { stdio: 'ignore', shell: true },
@@ -81,7 +81,7 @@ async function cleanup(codeOrError) {
       .map((c) => killTree(c.pid, 'SIGTERM')),
   );
   await killPort5173();
-  const isError = codeOrError instanceof Error || (typeof codeOrError==='number' && codeOrError !== 0) || (codeOrError && typeof codeOrError === 'object');
+  const isError = codeOrError instanceof Error || (typeof codeOrError === 'number' && codeOrError !== 0) || (codeOrError && typeof codeOrError === 'object');
   process.exit(isError ? 1 : 0);
 }
 
